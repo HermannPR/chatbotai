@@ -134,36 +134,41 @@ function App() {
     }
   };
 
-  // API call with full context
+  // API call to backend
   async function getChatCompletion(
     messages: Message[],
     systemPrompt: string
   ): Promise<string> {
-    const API_ENDPOINT = "http://10.14.255.61/v1/chat/completions";
-    const API_KEY = "sk-mDmOn2bG9Z3GDNW-x8wdeQ";
-    const apiMessages = [
-      ...(systemPrompt
-        ? [{ role: "system", content: systemPrompt }]
-        : []),
-      ...messages,
-    ];
-    const requestBody = {
-      model: "gpt-3.5-turbo",
-      messages: apiMessages,
-    };
-    const response = await fetch(API_ENDPOINT, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${API_KEY}`,
-      },
-      body: JSON.stringify(requestBody),
-    });
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
+    
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/chat`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          messages,
+          systemPrompt,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.error || "Error en la respuesta del backend");
+      }
+
+      return data.response;
+    } catch (error) {
+      console.error('Error calling backend:', error);
+      throw error;
     }
-    const data = await response.json();
-    return data.choices[0].message.content;
   }
 
   // Sidebar actions

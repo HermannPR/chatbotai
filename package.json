@@ -7,7 +7,12 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "install-all": "npm install && cd backend && npm install && cd ..",
+    "start": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "frontend": "vite",
+    "backend": "cd backend && npm start",
+    "backend-dev": "cd backend && npm run dev"
   },
   "dependencies": {
     "@radix-ui/react-icons": "^1.3.2",
@@ -29,6 +34,7 @@
     "@types/react-dom": "^19.1.2",
     "@vitejs/plugin-react-swc": "^3.9.0",
     "autoprefixer": "^10.4.21",
+    "concurrently": "^8.2.2",
     "eslint": "^9.25.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
